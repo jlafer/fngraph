@@ -1,0 +1,22 @@
+{
+  "name": "fngraph",
+  "version": "0.0.1",
+  "description": "a utility for composing function graphs",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlafer/fngraph.git"
+  },
+  "author": "jlafer",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jlafer/fngraph/issues"
+  },
+  "homepage": "https://github.com/jlafer/fngraph#readme",
+  "dependencies": {
+    "ramda": "^0.26.1"
+  }
+}
