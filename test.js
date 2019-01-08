@@ -1,4 +1,4 @@
-const {graphFn} = require('./index');
+const {fngraph} = require('./index');
 
 const sum = (x, y) => x + y;
 const product = (x, y) => x * y;
@@ -13,6 +13,6 @@ const graph = {
   'RETURN': [sum, 'f1', 'f3']
 };
 
-const f = graphFn(graph);
+const f = fngraph(graph);
 
-console.log(f([4, 2, 10]));
+f([4, 2, 10]).then(res => console.log(res));

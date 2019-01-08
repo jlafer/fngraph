@@ -2,7 +2,7 @@ var R = require('ramda');
 
 const makeNode = R.curry((args, [k, v]) => {
   if (typeof v === 'number')
-    return {key: k, ready: true, promise: Promise.resolve(args[v])};
+    return {key: k, ready: true, value: args[v]};
   else {
     const [fn, ...nodeArgs] = v;
     return {key: k, ready: false, function: fn, args: nodeArgs};
@@ -29,22 +29,22 @@ const getRunnableNode = (nodes) =>
 
 const executeNodeFn = (nodes, node) => {
   const prereqNodes = getPrereqNodes(nodes, node);
-  const prereqs = prereqNodes.map(node => node.promise);
-  return Promise.all(prereqs).then(args => node.function(...args));
+  const argValues = prereqNodes.map(node => node.value);
+  return node.function(...argValues);
 };
   
-const fngraph = R.curry((graph, args) => {
+const graphFn = R.curry((graph, args) => {
   const nodes = Object.entries(graph).map(makeNode(args));
   //console.log('nodes: ', nodes);
   while (someNodeisNotReady(nodes)) {
     let node = getRunnableNode(nodes);
-    node.promise = executeNodeFn(nodes, node);
+    node.value = executeNodeFn(nodes, node);
     node.ready = true;
     //console.log('nodes: ', nodes);
   }
-  return getNodeByName(nodes, 'RETURN').promise;
+  return getNodeByName(nodes, 'RETURN').value;
 });
 
 module.exports = {
-  fngraph
+  graphFn
 }
