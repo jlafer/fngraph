@@ -2,9 +2,11 @@
   "name": "fngraph",
   "version": "0.0.1",
   "description": "a utility for composing function graphs",
-  "main": "index.js",
+  "main": "distrib/index.js",
   "scripts": {
-    "test": "npm test"
+    "build": "babel src --out-dir distrib",
+    "prepublish": "npm run build",
+    "test": "jest --no-cache"
   },
   "repository": {
     "type": "git",
@@ -18,5 +20,11 @@
   "homepage": "https://github.com/jlafer/fngraph#readme",
   "dependencies": {
     "ramda": "^0.26.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "jest": "^23.6.0"
   }
 }

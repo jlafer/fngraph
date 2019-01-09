@@ -1,0 +1,6 @@
+<body>
+  <h2>A page of buttons</h2>
+  <button onClick=clickHandler>Click Me</button>
+  <button onClick=clickHandler>Press Me</button>
+  <button onClick=clickHandler>Impress Me</button>
+</body>
