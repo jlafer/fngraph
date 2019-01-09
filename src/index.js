@@ -9,27 +9,22 @@ const makeNode = R.curry((args, [k, v]) => {
   }
 });
 
-const someNodeisNotReady = (nodes) =>
-  nodes.some(node => ! node.ready);
+const someNodeisNotReady = (nodes) => nodes.some(node => ! node.ready);
 
 const getNodeByName = R.curry((nodes, arg) =>
   nodes.find(node => node.key === arg)
 );
 
-const getPrereqNodes = (nodes, node) =>
-  node.args.map(getNodeByName(nodes));
+const getPrereqNodes = (nodes, node) => node.args.map(getNodeByName(nodes));
 
-const allPrereqsReady = (nodes, node) => {
-  const prereqNodes = getPrereqNodes(nodes, node);
-  return prereqNodes.every(node => node.ready);
-};
+const allPrereqsReady = (nodes, node) =>
+  getPrereqNodes(nodes, node).every(node => node.ready);
 
 const getRunnableNode = (nodes) =>
   nodes.find(node => (! node.ready) && allPrereqsReady(nodes, node));
 
 const executeNodeFn = (nodes, node) => {
-  const prereqNodes = getPrereqNodes(nodes, node);
-  const prereqs = prereqNodes.map(node => node.promise);
+  const prereqs = getPrereqNodes(nodes, node).map(node => node.promise);
   return Promise.all(prereqs).then(args => node.function(...args));
 };
   
