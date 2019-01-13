@@ -8,7 +8,9 @@ fngraph is a utility for composing function graphs
 
 ## Usage
 
-Please see ./test.js for an example of using the `fngraph` function.
+```const {fngraph} = require('fngraph');
+
+```
 
 Document
 - partial application
@@ -19,12 +21,13 @@ Document
 
 - test cases
   - partial application of node function
-  - 
-- allow passing of result properties (make user call R.get)
-- allow constant arguments (e.g. 'utf8' in fs.read)
+  - controlled timing of async functions to verify parallelism
+  - graph can specify nodes in any order
+
 - validation
   - argument count matches function arity
   - data types in graph
   - required keys
   - references to nonexistant nodes
+  - cycles in graph
 

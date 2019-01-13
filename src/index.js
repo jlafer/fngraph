@@ -1,5 +1,11 @@
 var R = require('ramda');
 
+const {validate} = require('./validation');
+
+const formatTime = (date) => {
+  return `${date.toTimeString()}.${date.getMilliseconds()}`
+};
+
 const makeNode = R.curry((args, [k, v]) => {
   if (typeof v === 'number')
     return {key: k, ready: true, promise: Promise.resolve(args[v])};
@@ -25,20 +31,38 @@ const getRunnableNode = (nodes) =>
 
 const executeNodeFn = (nodes, node) => {
   const prereqs = getPrereqNodes(nodes, node).map(node => node.promise);
-  return Promise.all(prereqs).then(args => node.function(...args));
+  return Promise.all(prereqs)
+  .then(prereqs => {
+    console.log(`prereqs met: now executing ${node.key} at ${formatTime(new Date())}`);
+    return prereqs;
+  })
+  .then(args => {
+    return node.function(...args)
+  })
+  .then((res) => {
+    console.log(`executed ${node.key} at ${formatTime(new Date())}`);
+    return res;
+  });
 };
   
-const fngraph = R.curry((graph, args) => {
-  const nodes = Object.entries(graph).map(makeNode(args));
-  //console.log('nodes: ', nodes);
-  while (someNodeisNotReady(nodes)) {
-    let node = getRunnableNode(nodes);
-    node.promise = executeNodeFn(nodes, node);
-    node.ready = true;
-    //console.log('nodes: ', nodes);
+const fngraph = (graph) => {
+  const validation = validate(graph);
+  if ('ERROR' in validation) {
+    console.error('fngraph: invalid input graph:', validation.ERROR);
+    return validation;
   }
-  return getNodeByName(nodes, 'RETURN').promise;
-});
+  return function(args) {
+    const nodes = Object.entries(graph).map(makeNode(args));
+    //console.log('nodes: ', nodes);
+    while (someNodeisNotReady(nodes)) {
+      let node = getRunnableNode(nodes);
+      node.promise = executeNodeFn(nodes, node);
+      node.ready = true;
+      //console.log('nodes: ', nodes);
+    }
+    return getNodeByName(nodes, 'RETURN').promise;
+  }
+};
 
 module.exports = {
   fngraph
