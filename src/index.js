@@ -6,12 +6,12 @@ const formatTime = (date) => {
   return `${date.toTimeString()}.${date.getMilliseconds()}`
 };
 
-const makeNode = R.curry((args, [k, v]) => {
+const makeNode = R.curry((argArr, [k, v]) => {
   if (typeof v === 'number')
-    return {key: k, ready: true, promise: Promise.resolve(args[v])};
+    return {key: k, ready: true, promise: Promise.resolve(argArr[v])};
   else {
-    const [fn, ...nodeArgs] = v;
-    return {key: k, ready: false, function: fn, args: nodeArgs};
+    const [fn, ...nodeArgNames] = v;
+    return {key: k, ready: false, function: fn, args: nodeArgNames};
   }
 });
 
@@ -36,11 +36,12 @@ const executeNodeFn = (nodes, node) => {
     console.log(`prereqs met: now executing ${node.key} at ${formatTime(new Date())}`);
     return prereqs;
   })
-  .then(args => {
-    return node.function(...args)
+  .then(argArr => {
+    //console.log(`calling ${node.key} with arg list from this array:`, argArr);
+    return node.function(...argArr);
   })
   .then((res) => {
-    console.log(`executed ${node.key} at ${formatTime(new Date())}`);
+    console.log(`${node.key} returning ${res} at ${formatTime(new Date())}`);
     return res;
   });
 };
@@ -51,8 +52,8 @@ const fngraph = (graph) => {
     console.error('fngraph: invalid input graph:', validation.ERROR);
     return validation;
   }
-  return function(args) {
-    const nodes = Object.entries(graph).map(makeNode(args));
+  return function(argArr) {
+    const nodes = Object.entries(graph).map(makeNode(argArr));
     //console.log('nodes: ', nodes);
     while (someNodeisNotReady(nodes)) {
       let node = getRunnableNode(nodes);
@@ -64,6 +65,19 @@ const fngraph = (graph) => {
   }
 };
 
+const ifAll = (fn, altRes) => function(...args) {
+  //console.log('ifAll-made function destructured arg list into this array:', args);
+  return (args.some(item => item == undefined)) ? altRes : fn(...args);
+};
+
+// args is a variable-length parameter list
+const ifAny = (fn, altRes) => function(...args) {
+  //console.log('ifAny-made function destructured arg list into this array:', args);
+  return (args.every(item => item == undefined)) ? altRes : fn(...args);
+};
+
 module.exports = {
-  fngraph
+  fngraph,
+  ifAll,
+  ifAny
 }
