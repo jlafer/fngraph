@@ -1,7 +1,7 @@
 {
   "name": "fngraph",
-  "version": "0.0.5",
-  "description": "a utility for composing function graphs",
+  "version": "0.0.6",
+  "description": "A utility for composing function graphs.",
   "main": "distrib/index.js",
   "scripts": {
     "build": "babel src --out-dir distrib",
@@ -17,6 +17,15 @@
   "bugs": {
     "url": "https://github.com/jlafer/fngraph/issues"
   },
+  "keywords": [
+    "composition",
+    "functional",
+    "fp",
+    "HOF",
+    "pure",
+    "DAG",
+    "graph"
+  ],
   "homepage": "https://github.com/jlafer/fngraph#readme",
   "dependencies": {
     "ramda": "^0.26.1"
