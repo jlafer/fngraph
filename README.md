@@ -35,7 +35,7 @@ The fngraph utility has the following features:
 
 ## Usage
 
-Here's a trivial example using synchronous functions that take two parameters. Note that the composed function `f` is called with parameters placed in an array.
+Here's a trivial example using synchronous functions that take two parameters.
 
 ```
 const {fngraph} = require('fngraph');
@@ -51,7 +51,7 @@ const graph = {
 };
 
 const f = fngraph(graph);
-f([4, 2, 10]).then(console.log);  // 86
+f(4, 2, 10).then(console.log);  // 86
 ```
 
 Note that the result needs to be captured with `.then`, since `f` returns a promise.
@@ -78,7 +78,7 @@ const graph = {
 };
 
 const f = fngraph(graph);
-return f(['./test/buttons.txt', /button/g, 'SuperButton'])
+return f('./test/buttons.txt', /button/g, 'SuperButton')
 .then(res => {
   // operate on res...
 });
@@ -121,7 +121,6 @@ When `fngraph` is called to compose the graph function, it first validates the g
 
 - Functionality
   - add synchronous-only version of fngraph that will return a result and not a promise
-  - see if the array for holding execution arguments can be eliminated
 - Documentation
   - more realistic examples
   - use of R.get() to pass result properties downstream

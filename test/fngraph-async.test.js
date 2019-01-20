@@ -53,14 +53,14 @@ const graphTimed = {
 describe('fngraph asynchronous function tests', () => {
   test("fngraph async", () => {
     const f = fngraph(graph);
-    return f(['./test/buttons.txt', /button/g, 'SuperButton'])
+    return f('./test/buttons.txt', /button/g, 'SuperButton')
     .then(res => {
       expect(res).toEqual(expected);
     });
   });
   test("fngraph maximizes parallelism", () => {
     const f = fngraph(graphTimed);
-    return f([3, 4, 5])
+    return f(3, 4, 5)
     .then(res => {
       expect(res).toEqual(39);
     });

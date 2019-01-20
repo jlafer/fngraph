@@ -24,19 +24,19 @@ const graph = {
 describe('fngraph-ifAny hof tests', () => {
   test('fngraph-ifAny with good args', () => {
     const f = fngraph(graph);
-    return f([1, 2, 3, 4, 5]).then(res => {
+    return f(1, 2, 3, 4, 5).then(res => {
       expect(res).toEqual(3);
     });
   });
   test('fngraph-ifAny with one null arg', () => {
     const f = fngraph(graph);
-    return f([1, null, 3, null, 5]).then(res => {
+    return f(1, 2, null, 4, 5).then(res => {
       expect(res).toEqual(3);
     });
   });
   test('fngraph-ifAny with all null args', () => {
     const f = fngraph(graph);
-    return f([null, null, null, null, null]).then(res => {
+    return f(null, null, null, null, null).then(res => {
       expect(res).toEqual(0);
     });
   });

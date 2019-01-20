@@ -17,19 +17,19 @@ const graph = {
 describe('fngraph-ifAll hof tests', () => {
   test('fngraph-ifAll with good args', () => {
     const f = fngraph(graph);
-    return f([4, 2, 2]).then(res => {
+    return f(4, 2, 2).then(res => {
       expect(res).toEqual(10);
     });
   });
   test('fngraph-ifAll with one null arg', () => {
     const f = fngraph(graph);
-    return f([4, 2, null]).then(res => {
+    return f(4, 2, null).then(res => {
       expect(res).toEqual(9);
     });
   });
   test('fngraph-ifAll with all null args', () => {
     const f = fngraph(graph);
-    return f([null, null, 5]).then(res => {
+    return f(null, null, 5).then(res => {
       expect(res).toEqual(3);
     });
   });

@@ -50,8 +50,8 @@ const fngraph = (graph) => {
     console.error('fngraph: invalid input graph:', validation.ERROR);
     return validation;
   }
-  return function(argArr) {
-    const nodes = Object.entries(graph).map(makeNode(argArr));
+  return function(...args) {
+    const nodes = Object.entries(graph).map(makeNode(args));
     //console.log('nodes: ', nodes);
     while (someNodeisNotReady(nodes)) {
       let node = getRunnableNode(nodes);

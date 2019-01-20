@@ -46,7 +46,7 @@ const cyclicGraph = {
 describe('fngraph synchronous function tests', () => {
   test("fngraph simple", () => {
     const f = fngraph(graph);
-    return f([4, 2, 10]).then(res => {
+    return f(4, 2, 10).then(res => {
       expect(res).toEqual(86);
     });
   });
