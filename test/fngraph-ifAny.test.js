@@ -1,6 +1,6 @@
 const {fngraph, ifAny} = require('../src/index');
 
-function sparseAvg(...nums) {
+const sparseAvg = (...nums) => {
   const [total, values] = nums
     .filter(num => !(num == undefined))
     .reduce(

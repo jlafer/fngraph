@@ -1,28 +1,3 @@
-//const nodes = [
-//  {
-//    links: [ 1 ], // node 0 is linked to node 1
-//    visited: false
-//  }, {
-//    links: [ 0, 2 ], // node 1 is linked to node 0 and 2
-//    visited: false
-//  },
-//  ...
-// ];
-
-const getDuplicateKeys = (keys) => {
-  console.log('getDuplicateKeys: keys:', keys);
-  const set = new Set();
-  const dups = [];
-  keys.forEach(key => {
-    if (set.has(key))
-      dups.push(key)
-    else
-      set.add(key);
-  });
-  console.log('getDuplicateKeys: dups:', dups);
-  return dups;
-};
-
 const hasBadValueTypes = (nodes) => {
   const badValueTypeNames = Object.entries(nodes)
     .filter(
