@@ -13,6 +13,21 @@ const graph = {
   'RETURN': [sum, 'f1', 'f3']
 };
 
+const graphNotObject = [
+  {'a': 0},
+  {'b': 1},
+  {'RETURN': [sum, 'a', 'b']}
+];
+
+const graphNoReturn = {
+  'a': 0,
+  'b': 1,
+  'c': 2,
+  'f1': [sum, 'a', 'b'],
+  'f2': [product, 'b', 'c'],
+  'f3': [product, 'f2', 'f1']
+};
+
 const graphWithBadTypes = {
   'a': 0,
   'b': 1,
@@ -48,6 +63,14 @@ describe('fngraphSync function tests', () => {
     const f = fngraphSync(graph);
     const res = f(4, 2, 10);
     expect(res).toEqual(86);
+  });
+  test("fngraphSync throws error on graph not object", () => {
+    const f = fngraphSync(graphNotObject);
+    expect(f).toHaveProperty('ERROR');
+  });
+  test("fngraphSync throws error on graph missing RETURN", () => {
+    const f = fngraphSync(graphNoReturn);
+    expect(f).toHaveProperty('ERROR');
   });
   test("fngraphSync throws error on bad node values", () => {
     const f = fngraphSync(graphWithBadTypes);

@@ -40,6 +40,7 @@ const keyExists = (key, obj) => key in obj;
 
 const makeFwdNode = (name) => ({name, successors: []});
 
+// convert graph links from predecessors to successors
 const invertLinks = (accum, [nodeName, value]) => {
   const res = {...accum}
   if (Array.isArray(value)) {
@@ -98,6 +99,12 @@ const detectCycles = (nodes) => {
 const validate = (nodes) => {
   //console.log('validate: nodes:', nodes);
   let result;
+
+  if (typeof nodes !== 'object' || Array.isArray(nodes))
+    return {'ERROR': {message: 'graph is not an object', data: (typeof nodes)}};
+  
+  if (!keyExists('RETURN', nodes))
+    return {'ERROR': {message: 'graph is missing RETURN node', data: ''}};
 
   result = hasBadValueTypes(nodes);
   if ('ERROR' in result)
