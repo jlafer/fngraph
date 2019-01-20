@@ -4,9 +4,11 @@ const {validate} = require('./validation');
 
 const formatTime = (date) => `${date.toTimeString()}.${date.getMilliseconds()}`;
 
-const makeNode = R.curry((argArr, [k, v]) => {
-  if (typeof v === 'number')
-    return {key: k, ready: true, promise: Promise.resolve(argArr[v])};
+const makeNode = R.curry((isAsync, argArr, [k, v]) => {
+  if (typeof v === 'number') {
+    let value = isAsync ? Promise.resolve(argArr[v]) : argArr[v];
+    return {key: k, ready: true, value};
+  }
   else {
     const [fn, ...nodeArgNames] = v;
     return {key: k, ready: false, function: fn, args: nodeArgNames};
@@ -27,8 +29,8 @@ const allPrereqsReady = (nodes, node) =>
 const getRunnableNode = (nodes) =>
   nodes.find(node => !node.ready && allPrereqsReady(nodes, node));
 
-const executeNodeFn = (nodes, node) => {
-  const prereqs = getPrereqNodes(nodes, node).map(node => node.promise);
+const makeNodePromise = (nodes, node) => {
+  const prereqs = getPrereqNodes(nodes, node).map(node => node.value);
   return Promise.all(prereqs)
   .then(prereqs => {
     //console.log(`prereqs met: now executing ${node.key} at ${formatTime(new Date())}`);
@@ -44,22 +46,37 @@ const executeNodeFn = (nodes, node) => {
   });
 };
   
+const executeNodeFn = (nodes, node) => {
+  const prereqs = getPrereqNodes(nodes, node).map(node => node.value);
+  return node.function(...prereqs);
+};
+  
 const fngraph = (graph) => {
+  return _fngraph(graph, true);
+};
+
+const fngraphSync = (graph) => {
+  return _fngraph(graph, false);
+};
+
+const _fngraph = (graph, isAsync) => {
   const validation = validate(graph);
   if ('ERROR' in validation) {
     console.error('fngraph: invalid input graph:', validation.ERROR);
     return validation;
   }
   return function(...args) {
-    const nodes = Object.entries(graph).map(makeNode(args));
+    const nodes = Object.entries(graph).map(makeNode(isAsync, args));
     //console.log('nodes: ', nodes);
     while (someNodeisNotReady(nodes)) {
       let node = getRunnableNode(nodes);
-      node.promise = executeNodeFn(nodes, node);
+      node.value = isAsync
+        ? makeNodePromise(nodes, node)
+        : executeNodeFn(nodes, node);
       node.ready = true;
       //console.log('nodes: ', nodes);
     }
-    return getNodeByName(nodes, 'RETURN').promise;
+    return getNodeByName(nodes, 'RETURN').value;
   }
 };
 
@@ -71,6 +88,7 @@ const ifAny = (fn, altRes) => (...args) =>
 
 module.exports = {
   fngraph,
+  fngraphSync,
   ifAll,
   ifAny
 }

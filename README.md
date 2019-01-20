@@ -15,7 +15,9 @@ const f = fngraph(graph);
 f(fnArgs).then(fnToConsumeResults);
 ```
 
-`fngraph` is a higher-order function (HOF) for composing functions that implement a function graph for execution at a later time.
+`fngraph` is a higher-order function (HOF) for composing synchronous and asynchronous functions into a function graph for execution at a later time. That execution returns a promise.
+
+If you are composing with only synchronous functions, you can use `fngraphSync`, whose composed function returns its result immediately.
 
 With fngraph, you compose a complex function from a number of simpler functions. The graph definition is both highly declarative -- it's just a Javascript object -- and succint, making it easy to define, visualize, understand, review for correctness and validate programmatically.
 
@@ -26,7 +28,6 @@ The fngraph utility has the following features:
 - Functions in the graph can be any combination of synchronous or asynchronous (if they return a Promise).
 - At creation time, the function graph is validated using a number of checks for syntactical and structural correctness. For example, it is checked for cyclicality.
 - When composing with asynchronous functions (that return a promise), parallel path execution is maximized automatically.
-- When executed, the composed function returns a promise.
 - fngraph comes with a few helper HOFs for wrapping functions used in the composition. This is useful for things like error handling and dealing with bad inputs. For example, `ifAll(function, altResult)` will execute the wrapped function if all input arguments are defined and non-null; otherwise it will return an alternate result specified by the user. This provides capabilities similar to those of `Maybe` and `Either` functors. The user can also write custom wrappers if needed.
 
 ## Installation
@@ -38,7 +39,7 @@ The fngraph utility has the following features:
 Here's a trivial example using synchronous functions that take two parameters.
 
 ```
-const {fngraph} = require('fngraph');
+const {fngraphSync} = require('fngraph');
 
 const graph = {
   'a': 0,
@@ -50,11 +51,9 @@ const graph = {
   'RETURN': [sum, 'f1', 'f3']
 };
 
-const f = fngraph(graph);
-f(4, 2, 10).then(console.log);  // 86
+const f = fngraphSync(graph);
+console.log( f(4, 2, 10) );  // 86
 ```
-
-Note that the result needs to be captured with `.then`, since `f` returns a promise.
 
 Here's an example using a function that returns a Promise.
 
@@ -84,7 +83,9 @@ return f('./test/buttons.txt', /button/g, 'SuperButton')
 });
 ```
 
-Note how we partially applied the file encoding (utf8) to the curried `getData()` function above. With relatively static arguments, this is a great convenience from traditional function composition that is preserved by fngraph.
+Note that the result needs to be captured with `.then`, since `f` returns a promise.
+
+Note also how we partially applied the file encoding (utf8) to the curried `getData()` function above. With relatively static arguments, this is a great convenience from traditional function composition that is preserved by fngraph.
 
 ## Function Graph Definition
 A function graph is defined with a simple object that has the shape below. Order of keys, of course, is not important but can be clarifying for humans.
@@ -107,7 +108,7 @@ For nodes, the `fnNode` is a heterogeneous array containing the function to be e
 One function node property must be named `RETURN` and represents the exit function of the graph that produces the result.
 
 ## Function Graph Validation
-When `fngraph` is called to compose the graph function, it first validates the graph definition for correct syntax, no "dangling" references, acyclicality, etc. If an error is detected, it returns an error object rather than a function. The error object contains an "ERROR" property. Here's a sample error object:
+When `fngraph` or `fngraphSync` is called to compose the graph function, it first validates the graph definition for correct syntax, no "dangling" references, acyclicality, etc. If an error is detected, it returns an error object rather than a function. The error object contains an "ERROR" property. Here's a sample error object:
 ```
 {
   ERROR: {
@@ -119,8 +120,6 @@ When `fngraph` is called to compose the graph function, it first validates the g
 
 ## ToDo
 
-- Functionality
-  - add synchronous-only version of fngraph that will return a result and not a promise
 - Documentation
   - more realistic examples
   - use of R.get() to pass result properties downstream

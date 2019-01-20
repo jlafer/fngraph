@@ -1,6 +1,6 @@
 {
   "name": "fngraph",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "a utility for composing function graphs",
   "main": "distrib/index.js",
   "scripts": {
