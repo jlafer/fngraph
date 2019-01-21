@@ -41,6 +41,9 @@ Here's a trivial example using synchronous functions that take two parameters.
 ```
 const {fngraphSync} = require('fngraph');
 
+const sum = (x, y) => x + y;
+const product = (x, y) => x * y;
+
 const graph = {
   'a': 0,
   'b': 1,

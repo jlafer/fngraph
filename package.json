@@ -1,6 +1,6 @@
 {
   "name": "fngraph",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "A utility for composing function graphs.",
   "main": "distrib/index.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/jlafer/fngraph.git"
   },
-  "author": "jlafer",
+  "author": "John Lafer",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/jlafer/fngraph/issues"

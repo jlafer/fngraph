@@ -1,38 +1,30 @@
+const makeError = (message, data) => ({'ERROR': {message, data}});
+
 const hasBadValueTypes = (nodes) => {
   const badValueTypeNames = Object.entries(nodes)
     .filter(
       ([_name, value]) => (typeof value !== 'number' && !Array.isArray(value))
     )
-    .map(
-      ([name, _value]) => name
-    );
+    .map(([name, _value]) => name);
   if (badValueTypeNames.length)
-    return {
-      'ERROR': {
-        message: 'nodes with bad value types',
-        data: badValueTypeNames
-      }
-    };
+    return makeError('nodes with bad value types', badValueTypeNames);
   return {};
 };
 
 const hasBadArgRefs = (nodes) => {
-  const argNames = Object.keys(nodes)
-    .filter(name => name !== 'RETURN');
+  const argNames = Object.keys(nodes).filter(name => name !== 'RETURN');
   const argRefs = Object.values(nodes)
-    .filter((value) => Array.isArray(value))
+    .filter(value => Array.isArray(value))
     .reduce(
       (refs, value) => {
-        const newRefs = [];
-        const [fn, ...argRefs] = value;
-        argRefs.forEach(ref => newRefs.push(ref));
-        return [...refs, ...newRefs];
+        const [_fn, ...argRefs] = value;
+        return [...refs, ...argRefs];
       },
       []
     );
   const badArgRefs = argRefs.filter(ref => !argNames.includes(ref));
   if (badArgRefs.length)
-    return {'ERROR': {message: 'bad graph node refs', data: badArgRefs}};
+    return makeError('bad graph node refs', badArgRefs);
   return {};
 };
 
@@ -63,21 +55,16 @@ const invertLinks = (accum, [nodeName, value]) => {
 };
 
 const findCycle = (graph, nodeName, history) => {
-  //console.log(`findCycle: with ${nodeName} after `, history);
-  if (history.includes(nodeName)) {
-    //console.log(`findCycle: found cycle:`, history);
+  if (history.includes(nodeName))
     return [true, [...history, nodeName]];
-  }
   const node = graph[nodeName];
   if (node.successors.length == 0)
     return [false, []];
   const result = node.successors.reduce(
     (error, successorName) => {
       let [found, path] = findCycle(graph, successorName, [...history, nodeName]);
-      if (found) {
-        //console.log(`findCycle: found cycle in successor ${successorName}:`, path);
+      if (found)
         return [found, path];
-      }
       return error;
     },
     []
@@ -87,24 +74,20 @@ const findCycle = (graph, nodeName, history) => {
 
 const detectCycles = (nodes) => {
   const graph = Object.entries(nodes).reduce(invertLinks, {});
-  //console.log('detectCycles: graph:', graph);
   const [found, path] = findCycle(graph, 'ENTRY', []);
-  if (found) {
-    //console.log('detectCycles: found cycle:', path);
-    return {'ERROR': {message: 'fn graph contains a cycle', data: path}};
-  }
+  if (found)
+    return makeError('fn graph contains a cycle', path);
   return {};
 };
 
 const validate = (nodes) => {
-  //console.log('validate: nodes:', nodes);
   let result;
 
   if (typeof nodes !== 'object' || Array.isArray(nodes))
-    return {'ERROR': {message: 'graph is not an object', data: (typeof nodes)}};
+    return makeError('graph is not an object', (typeof nodes));
   
   if (!keyExists('RETURN', nodes))
-    return {'ERROR': {message: 'graph is missing RETURN node', data: ''}};
+    return makeError('graph is missing RETURN node', '');
 
   result = hasBadValueTypes(nodes);
   if ('ERROR' in result)

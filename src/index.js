@@ -2,8 +2,6 @@ var R = require('ramda');
 
 const {validate} = require('./validation');
 
-const formatTime = (date) => `${date.toTimeString()}.${date.getMilliseconds()}`;
-
 const makeNode = R.curry((isAsync, argArr, [k, v]) => {
   if (typeof v === 'number') {
     let value = isAsync ? Promise.resolve(argArr[v]) : argArr[v];
@@ -15,7 +13,7 @@ const makeNode = R.curry((isAsync, argArr, [k, v]) => {
   }
 });
 
-const someNodeisNotReady = nodes => nodes.some(node => !node.ready);
+const someNodeIsNotReady = nodes => nodes.some(node => !node.ready);
 
 const getNodeByName = R.curry((nodes, arg) =>
   nodes.find(node => node.key === arg)
@@ -33,30 +31,13 @@ const makeNodePromise = (nodes, node) => {
   const prereqs = getPrereqNodes(nodes, node).map(node => node.value);
   return Promise.all(prereqs)
   .then(prereqs => {
-    //console.log(`prereqs met: now executing ${node.key} at ${formatTime(new Date())}`);
-    return prereqs;
+    return node.function(...prereqs);
   })
-  .then(argArr => {
-    //console.log(`calling ${node.key} with arg list from this array:`, argArr);
-    return node.function(...argArr);
-  })
-  .then((res) => {
-    //console.log(`${node.key} returning ${res} at ${formatTime(new Date())}`);
-    return res;
-  });
 };
   
 const executeNodeFn = (nodes, node) => {
   const prereqs = getPrereqNodes(nodes, node).map(node => node.value);
   return node.function(...prereqs);
-};
-  
-const fngraph = (graph) => {
-  return _fngraph(graph, true);
-};
-
-const fngraphSync = (graph) => {
-  return _fngraph(graph, false);
 };
 
 const _fngraph = (graph, isAsync) => {
@@ -65,20 +46,26 @@ const _fngraph = (graph, isAsync) => {
     console.error('fngraph: invalid input graph:', validation.ERROR);
     return validation;
   }
+
   return function(...args) {
     const nodes = Object.entries(graph).map(makeNode(isAsync, args));
-    //console.log('nodes: ', nodes);
-    while (someNodeisNotReady(nodes)) {
+    while (someNodeIsNotReady(nodes)) {
       let node = getRunnableNode(nodes);
       node.value = isAsync
         ? makeNodePromise(nodes, node)
         : executeNodeFn(nodes, node);
       node.ready = true;
-      //console.log('nodes: ', nodes);
     }
     return getNodeByName(nodes, 'RETURN').value;
   }
 };
+
+const IS_ASYNC = true;
+const IS_SYNC = false;
+
+const fngraph = (graph) =>  _fngraph(graph, IS_ASYNC);
+
+const fngraphSync = (graph) => _fngraph(graph, IS_SYNC);
 
 const ifAll = (fn, altRes) => (...args) =>
   (args.some(item => item == undefined)) ? altRes : fn(...args);
