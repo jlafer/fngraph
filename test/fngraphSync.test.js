@@ -13,6 +13,19 @@ const graph = {
   'RETURN': [sum, 'f1', 'f3']
 };
 
+const boxSurfaceArea = (x, y, z) => (2 * x * y) + (4 * y * z);
+const boxVolume = (x, y, z) => x * y * z;
+const ratio = (x, y) => x / y;
+
+const saVolGraph = {
+  'length': 0,
+  'width': 1,
+  'depth': 2,
+  'surface': [boxSurfaceArea, 'length', 'width', 'depth'],
+  'volume': [boxVolume, 'length', 'width', 'depth'],
+  'RETURN': [ratio, 'surface', 'volume']
+};
+
 const graphNotObject = [
   {'a': 0},
   {'b': 1},
@@ -63,6 +76,11 @@ describe('fngraphSync function tests', () => {
     const f = fngraphSync(graph);
     const res = f(4, 2, 10);
     expect(res).toEqual(86);
+  });
+  test("fngraphSync calculates sa-vol", () => {
+    const f = fngraphSync(saVolGraph);
+    const res = f(2, 2, 5);
+    expect(res).toEqual(2.4);
   });
   test("fngraphSync throws error on graph not object", () => {
     const f = fngraphSync(graphNotObject);

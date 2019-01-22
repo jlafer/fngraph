@@ -1,5 +1,4 @@
 var R = require('ramda');
-
 const {validate} = require('./validation');
 
 const makeNode = R.curry((isAsync, argArr, [k, v]) => {
@@ -21,23 +20,23 @@ const getNodeByName = R.curry((nodes, arg) =>
 
 const getPrereqNodes = (nodes, node) => node.args.map(getNodeByName(nodes));
 
+const getPrereqValues = (nodes, node) =>
+  getPrereqNodes(nodes, node).map(n => n.value);
+
 const allPrereqsReady = (nodes, node) =>
-  getPrereqNodes(nodes, node).every(node => node.ready);
+  getPrereqNodes(nodes, node).every(n => n.ready);
 
 const getRunnableNode = (nodes) =>
   nodes.find(node => !node.ready && allPrereqsReady(nodes, node));
 
 const makeNodePromise = (nodes, node) => {
-  const prereqs = getPrereqNodes(nodes, node).map(node => node.value);
-  return Promise.all(prereqs)
-  .then(prereqs => {
-    return node.function(...prereqs);
-  })
+  const promises = getPrereqValues(nodes, node);
+  return Promise.all(promises).then(args => node.function(...args));
 };
   
 const executeNodeFn = (nodes, node) => {
-  const prereqs = getPrereqNodes(nodes, node).map(node => node.value);
-  return node.function(...prereqs);
+  const args = getPrereqValues(nodes, node);
+  return node.function(...args);
 };
 
 const _fngraph = (graph, isAsync) => {
