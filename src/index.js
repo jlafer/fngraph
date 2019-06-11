@@ -1,7 +1,7 @@
-var R = require('ramda');
-const {validate} = require('./validation');
+import {curry} from 'ramda';
+import {validate} from './validation';
 
-const makeNode = R.curry((isAsync, argArr, [k, v]) => {
+const makeNode = curry((isAsync, argArr, [k, v]) => {
   if (typeof v === 'number') {
     let value = isAsync ? Promise.resolve(argArr[v]) : argArr[v];
     return {key: k, ready: true, value};
@@ -14,7 +14,7 @@ const makeNode = R.curry((isAsync, argArr, [k, v]) => {
 
 const someNodeIsNotReady = nodes => nodes.some(node => !node.ready);
 
-const getNodeByName = R.curry((nodes, arg) =>
+const getNodeByName = curry((nodes, arg) =>
   nodes.find(node => node.key === arg)
 );
 
@@ -62,19 +62,12 @@ const _fngraph = (graph, isAsync) => {
 const IS_ASYNC = true;
 const IS_SYNC = false;
 
-const fngraph = (graph) =>  _fngraph(graph, IS_ASYNC);
+export const fngraph = (graph) =>  _fngraph(graph, IS_ASYNC);
 
-const fngraphSync = (graph) => _fngraph(graph, IS_SYNC);
+export const fngraphSync = (graph) => _fngraph(graph, IS_SYNC);
 
-const ifAll = (fn, altRes) => (...args) =>
+export const ifAll = (fn, altRes) => (...args) =>
   (args.some(item => item == undefined)) ? altRes : fn(...args);
 
-const ifAny = (fn, altRes) => (...args) =>
+export const ifAny = (fn, altRes) => (...args) =>
   (args.every(item => item == undefined)) ? altRes : fn(...args);
-
-module.exports = {
-  fngraph,
-  fngraphSync,
-  ifAll,
-  ifAny
-}

@@ -94,7 +94,7 @@ const detectCycles = (nodes) => {
   return {};
 };
 
-const validate = (nodes) => {
+export const validate = (nodes) => {
   let result;
 
   if (typeof nodes !== 'object' || Array.isArray(nodes))
@@ -112,7 +112,3 @@ const validate = (nodes) => {
     return result;
   return {};
 };
-
-module.exports = {
-  validate
-}
