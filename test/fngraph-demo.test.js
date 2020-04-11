@@ -73,7 +73,7 @@ describe('fngraph demo test', () => {
     const makeProductCampaignEmail = fngraph(graph);
     return makeProductCampaignEmail(db, 1001, 42, newYearsPromo)
     .then(res => {
-      console.log(res);
+      //console.log(res);
       expect(res).toEqual(expected);
     });
   });

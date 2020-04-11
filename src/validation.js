@@ -69,7 +69,7 @@ const findCycle = (graph, nodeName, history) => {
     return [false, []];
   if (history.includes(nodeName))
     return [true, [...history, nodeName]];
-  console.log(`findCycle: looking at ${nodeName}`);
+  //console.log(`findCycle: looking at ${nodeName}`);
   const node = graph[nodeName];
   if (node.successors.length == 0)
     return [false, []];
